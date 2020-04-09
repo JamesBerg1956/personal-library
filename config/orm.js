@@ -27,7 +27,12 @@ class ORM {
     return this.connection.query(queryString, [table])
   }
 
-  // TODO: create selectWhere function
+  // create innerJoin function
+  innerJoin(table, columns, joinTable, tableId, joinTableId){
+    const queryString = `SELECT ${columns.join(', ')} FROM ?? INNER JOIN ?? ON ??.?? = ??.??`;
+
+    return this.connection.query(queryString, table, joinTable, table,tableId, joinTable, joinTableId);
+  }
 
   // TODO: create selectJoinWhere
 
@@ -52,6 +57,9 @@ class ORM {
   // TODO: create deleteWhere function
 
 };
+
+var orm = new ORM();
+
 
 // Export the orm object for the model (cat.js).
 module.exports = new ORM(connection);
