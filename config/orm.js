@@ -34,7 +34,19 @@ class ORM {
     return this.connection.query(queryString, table, joinTable, table,tableId, joinTable, joinTableId);
   }
 
-  // TODO: create selectJoinWhere
+  // create selectJoinWhere
+  innerJoinWhere(table, columns, joinTable, tableId, joinTableId, whereColumn, whereValue){
+    const queryString = `SELECT ${columns.join(', ')} FROM ?? INNER JOIN ?? ON ??.?? = ??.?? WHERE ?? = ?`;
+
+    return this.connection.query(queryString, table, joinTable, table,tableId, joinTable, joinTableId, whereColumn, whereValue);
+  }
+
+  // create deleteWhere function
+  deleteFrom(table, column, value){
+      const queryString = `DELETE FROM ?? WHERE ?? = ?`;
+
+      return this.connection.query(queryString, table, column, value);
+  }
 
   create(table, columns, values) {
     
@@ -53,8 +65,6 @@ class ORM {
 
     return this.connection.query(queryString, [table, objColVals, id])
   }
-
-  // TODO: create deleteWhere function
 
 };
 
