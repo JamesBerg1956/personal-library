@@ -12,59 +12,43 @@ class ORM {
   // In order to write the query, we need 3 question marks.
   // This helper function loops through and creates an array of question marks - ["?", "?", "?"] - and turns it into a string.
   // ["?", "?", "?"].join(', ') => "?, ?, ?";
-  printQuestionMarks(numberOfValues){
+  printQuestionMarks(numberOfValuesOrColumns, type){
     const questionMarks = [];
-
-    for (var i = 0; i < numberOfValues; i++) {
-      questionMarks.push("?");
+    for (var i = 0; i < numberOfValuesOrColumns; i++) {
+      if(type === 'cols'){
+        questionMarks.push("??");
+      } else {
+        questionMarks.push("?")
+      }
     }
-
     return questionMarks.join(', ');
   }
 
-  selectAll(table) {
-    const queryString = 'SELECT * FROM  ??';
-    return this.connection.query(queryString, [table])
-  }
-
   // create innerJoin function
-  innerJoin(table, columns, joinTable, tableId, joinTableId){
-    const queryString = `SELECT ${columns.join(', ')} FROM ?? INNER JOIN ?? ON ??.?? = ??.??`;
-
-    return this.connection.query(queryString, table, joinTable, table,tableId, joinTable, joinTableId);
+  innerJoin(colsToSelect, tableOne, tableTwo, tableOneCol, tableTwoCol) {
+    // 'SELECT firstName, lastName, title, coverPhoto FROM authors INNER JOIN books ON authors.id = books.authorsId'
+    const queryString = `SELECT ${this.printQuestionMarks(colsToSelect.length, 'cols')} FROM ?? INNER JOIN ?? ON ??.?? = ??.??`;
+    return this.connection.query(queryString, [...colsToSelect, tableOne, tableTwo, tableOne, tableOneCol, tableTwo, tableTwoCol])
   }
 
-  // create selectJoinWhere
-  innerJoinWhere(table, columns, joinTable, tableId, joinTableId, whereColumn, whereValue){
-    const queryString = `SELECT ${columns.join(', ')} FROM ?? INNER JOIN ?? ON ??.?? = ??.?? WHERE ?? = ?`;
+  innerJoinWhere(colsToSelect, tableOne, tableTwo, tableOneCol, tableTwoCol, whereColumn, whereValue) {
+    const queryString = `SELECT ${this.printQuestionMarks(colsToSelect.length, 'cols')} FROM ?? INNER JOIN ?? ON ??.?? = ??.?? WHERE ?? = ?`;
+    return this.connection.query(queryString, [...colsToSelect, tableOne, tableTwo, tableOne, tableOneCol, tableTwo, tableTwoCol, whereColumn, whereValue])
+  }
 
-    return this.connection.query(queryString, table, joinTable, table,tableId, joinTable, joinTableId, whereColumn, whereValue);
+  create(table, values) {
+    const queryString = `INSERT INTO ?? SET ?`;
+
+    return this.connection.query(queryString, [table, values])
   }
 
   // create deleteWhere function
   deleteFrom(table, column, value){
       const queryString = `DELETE FROM ?? WHERE ?? = ?`;
 
-      return this.connection.query(queryString, table, column, value);
+      return this.connection.query(queryString, [table, column, value]);
   }
 
-  create(table, columns, values) {
-    
-    const queryString = `INSERT INTO ?? (${columns.join(', ')}) VALUES (${this.printQuestionMarks(values.length)})`;
-
-    console.log(queryString);
-
-    return this.connection.query(queryString, [table, ...values])
-  }
-
-  // An example of objColVals would be {name: panther, hungry: true}
-  update(table, objColVals, id) {
-    var queryString = `UPDATE ?? SET ? WHERE ?`;
-
-    console.log(queryString);
-
-    return this.connection.query(queryString, [table, objColVals, id])
-  }
 
 };
 
