@@ -1,47 +1,82 @@
 const db = require('../db')
 
+const book = require("../models/book.js");
+const bookNote = require("../models/note.js");
+
 module.exports = (app) => {
 
-  app.get('/api/books', (req, res) => {
-   db.getAllBooks()
-    .then(results => res.json(results))
+  app.get("/api/books", (req, res) => {
+    book.getAllBooks()
+    .then(function(results){
+      res.json(results)
+    })
     .catch(error => res.json(error))
   });
 
   app.get('/api/book/:name', (req, res) => {
     const bookName = req.params.name;
-    db.getOneBook(bookName)
+    book.getOneBook(bookName)
     .then(results => res.json(results))
     .catch(error => res.json(error))
-  })
-
-  app.get('/api/book/notes/:name', (req, res) => {
-    const bookName = req.params.name;
-
-    db.getBookNotes(bookName)
-    .then(results => res.json(results))
-    .catch(error => res.status(500).json(error))
-  })
+  });
 
   app.post('/api/book/new', (req, res) => {
     const { title, coverPhoto, authorId } = req.body;
 
-    db.addBook(title, coverPhoto, authorId)
+    book.addBook(title, coverPhoto, authorId)
     .then(() => res.status(200).json(true))
+    .catch(error => res.status(500).json(error))
+  });
+
+  app.get('/api/book/notes/:name', (req, res) => {
+    const bookName = req.params.name;
+
+    bookNote.getBookNotes(bookName)
+    .then(results => res.json(results))
     .catch(error => res.status(500).json(error))
   });
 
   app.post('/api/book/note', (req, res) => {
     const { note, bookId } = req.body;
-
-    db.addBookNote(note, bookId)
+    
+    bookNote.addBookNote(note, bookId)
     .then(() => res.status(200).json(true))
     .catch(error => res.status(500).json(error))
-  })
+  });
 
   app.delete('/api/note/:id', (req, res) => {
-    db.deleteNote(req.params.id)
+    bookNote.deleteNote(req.params.id)
     .then(() => res.status(200).json(true))
     .catch(error => res.status(500).json(error))
-  })
+  });
+
+  // app.get('/api/books', (req, res) => {
+  //  db.getAllBooks()
+  //   .then(results =>  res.json(results))
+  //   .catch(error => res.json(error))
+  // });
+
+  // app.get('/api/book/:name', (req, res) => {
+  //   const bookName = req.params.name;
+  //   db.getOneBook(bookName)
+  //   .then(results => res.json(results))
+  //   .catch(error => res.json(error))
+  // })
+
+  // app.get('/api/book/notes/:name', (req, res) => {
+  //   const bookName = req.params.name;
+
+  //   db.getBookNotes(bookName)
+  //   .then(results => res.json(results))
+  //   .catch(error => res.status(500).json(error))
+  // })
+
+  // app.post('/api/book/note', (req, res) => {
+  //   const { note, bookId } = req.body;
+
+  //   db.addBookNote(note, bookId)
+  //   .then(() => res.status(200).json(true))
+  //   .catch(error => res.status(500).json(error))
+  // })
+
 }

@@ -1,4 +1,4 @@
-const connection = require('./connection');
+const connection = require('../config/connection.js');
 
 class DB { 
   constructor(connection){
@@ -14,17 +14,18 @@ class DB {
     return this.connection.query('SELECT books.id, firstName, lastName, title, coverPhoto FROM authors INNER JOIN books ON authors.id = books.authorId WHERE books.title=?', [bookTitle])
   }
 
+  addBook(title, coverPhoto, authorId){
+    return this.connection.query('INSERT INTO books SET ?', 
+      {
+        title,
+        authorId,
+        coverPhoto
+      })
+   }
+ 
+
   getBookNotes(bookTitle){
    return this.connection.query('SELECT notes.id, note FROM notes INNER JOIN books ON books.id = notes.bookId WHERE books.title=?', [bookTitle])
-  }
-
-  addBook(title, coverPhoto, authorId){
-   return this.connection.query('INSERT INTO books SET ?', 
-     {
-       title,
-       authorId,
-       coverPhoto
-     })
   }
 
   addBookNote(note, bookId){
